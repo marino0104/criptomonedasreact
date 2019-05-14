@@ -1,13 +1,63 @@
 import React, { Component } from 'react';
+import Axios from 'axios';
+import Criptomoneda from './Criptomoneda';
+import Error from './Error'
 
 class Formulario extends Component {
+    state={
+        criptomonedas:[],
+        moneda:'',
+        criptomoneda:'',
+        error:false
+
+    }
+    async componentWillMount(){
+        const url='https://min-api.cryptocompare.com/data/top/mktcapfull?limit=10&tsym=USD';
+        await Axios.get(url)
+        .then(respuesta=>{
+            this.setState({
+               criptomonedas: respuesta.data.Data
+            })
+        })
+    }
+    obtenerValor=e=>{
+        const {name, value}=e.target;
+        this.setState({
+            [name]:value
+        })
+    }
+    cotizarMoneda=(e)=>{
+        e.preventDefault();
+        // validar que haya algo en el state
+        const{moneda, criptomoneda}=this.state;
+        if(moneda==='' || criptomoneda===''){
+            this.setState({
+                error:true
+            },()=>{
+                setTimeout(()=>{
+                    this.setState({
+                        error:false
+                    })
+                })
+            },3000
+
+            )
+        }
+        // crear objeto
+
+        // enviar datos a applicationCache.js para cotizar
+    }
     render() {
+        const mensaje=(this.state.error)?<Error mensaje="Ambos campos son obligatorios"/>:''
         return (
             <div>
-                <form>
+                <form onSubmit={this.cotizarMoneda}>
+                {mensaje}
                     <div className="row">
                         <label>Elige tu Moneda</label>
                         <select
+                            onChange={this.obtenerValor}
+                            name="moneda"
                             className="u-full-width">
                                 <option value="">Elige tu moneda</option>
                                 <option value="USD">Dolar Estadounidense</option>
@@ -21,8 +71,17 @@ class Formulario extends Component {
                     <div className="row">
                         <div>
                             <label>Elige tu Criptomoneda</label>
-                            <select className="u-full-width">
+                            <select 
+                                onChange={this.obtenerValor}
+                                name="criptomoneda"
+                                className="u-full-width">
                                 <option value="">Elige tu criptomoneda</option>
+                                {Object.keys(this.state.criptomonedas).map(key=>(
+                                    <Criptomoneda
+                                        key={key}
+                                        criptomoneda={this.state.criptomonedas[key]}
+                                    />
+                                ))}
                             </select>
                         </div>
                     </div>
