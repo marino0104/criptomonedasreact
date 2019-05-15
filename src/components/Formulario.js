@@ -38,14 +38,18 @@ class Formulario extends Component {
                     this.setState({
                         error:false
                     })
-                })
-            },3000
+            },3000);
 
-            )
+        })
+        return;
         }
         // crear objeto
-
+        const cotizacion={
+            moneda,
+            criptomoneda
+        }
         // enviar datos a applicationCache.js para cotizar
+        this.props.cotizarCriptomoneda(cotizacion);
     }
     render() {
         const mensaje=(this.state.error)?<Error mensaje="Ambos campos son obligatorios"/>:''
